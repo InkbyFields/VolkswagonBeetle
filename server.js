@@ -4,19 +4,26 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const formidable = require('formidable'); // For file uploads
-const path = require('path');
-const { router: userRoutes, authenticate } = require('./routes/userRoutes'); // Import auth middleware and routes
+const formidable = require('formidable'); // Import formidable for file uploads
+const path = require('path'); // Import path for handling file paths
+const { router: userRoutes } = require('./routes/userRoutes');
 
 const app = express();
 
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
+
 // Middleware
-app.use(express.json()); // Parse JSON bodies
-app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS
+app.use(express.json());
+app.use(helmet());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per window
+  windowMs: 15 * 60 * 1000,
+  max: 100
 }));
 
 // MongoDB Connection
@@ -26,11 +33,8 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
   console.error('MongoDB connection error:', err);
 });
 
-// Static files (for serving uploaded images)
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
 // File Upload Route
-app.post('/upload', authenticate, (req, res) => {
+app.post('/upload', (req, res) => {
   const form = new formidable.IncomingForm({
     uploadDir: path.join(__dirname, 'uploads'),
     keepExtensions: true,
@@ -48,21 +52,22 @@ app.post('/upload', authenticate, (req, res) => {
   });
 });
 
-// Logbook Entry Route (Protected with Token Authentication)
-app.post('/api/users/logbook', authenticate, (req, res) => {
+// Logbook Entry Route
+app.post('/api/users/logbook', (req, res) => {
   const { entry } = req.body;
 
   if (!entry) {
     return res.status(400).json({ message: 'Log entry cannot be empty' });
   }
 
-  // In a real-world scenario, you would save this to a database.
+  // Here you would typically save the log entry to the database
+  // For demonstration, we'll just return a success message
   res.status(201).json({ message: 'Log entry added successfully', entry });
 });
 
 // Basic route
 app.get('/', (req, res) => {
-  res.send('Hello World!');
+  res.sendFile(path.join(__dirname, 'public/index.html')); // Serve the homepage
 });
 
 // Integrate the user authentication routes
@@ -73,8 +78,3 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
-
-
-
-

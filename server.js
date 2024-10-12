@@ -4,26 +4,22 @@ const mongoose = require('mongoose');
 const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
-const formidable = require('formidable'); // Import formidable for file uploads
-const path = require('path'); // Import path for handling file paths
+const formidable = require('formidable');
+const path = require('path');
 const { router: userRoutes } = require('./routes/userRoutes');
 
 const app = express();
 
-// Serve static files from the 'public' directory
-app.use(express.static('public'));
+// Serve static files dynamically, regardless of where they are located
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware
 app.use(express.json());
 app.use(helmet());
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 app.use(rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100
+  windowMs: 15 * 60 * 1000,  // 15 minutes
+  max: 100,
 }));
 
 // MongoDB Connection
@@ -60,14 +56,12 @@ app.post('/api/users/logbook', (req, res) => {
     return res.status(400).json({ message: 'Log entry cannot be empty' });
   }
 
-  // Here you would typically save the log entry to the database
-  // For demonstration, we'll just return a success message
   res.status(201).json({ message: 'Log entry added successfully', entry });
 });
 
-// Basic route
+// Basic route for root
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html')); // Serve the homepage
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));  // Serve the homepage
 });
 
 // Integrate the user authentication routes

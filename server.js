@@ -67,6 +67,11 @@ app.get('/', (req, res) => {
 // Integrate the user authentication routes
 app.use('/api/users', userRoutes);
 
+// Catch-all route for frontend routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // Listen on port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

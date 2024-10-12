@@ -6,9 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "lint": "eslint .",
-    "test": "mocha",
-    "prepare": "if [ $NETLIFY != 'true' ]; then husky install; fi"
+    "build": "echo 'This project does not require a build step'",
+    "lint": "eslint ."
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -26,7 +25,9 @@
     "chai": "^4.2.0",
     "eslint": "^7.7.0",
     "mocha": "^10.7.3",
-    "nodemon": "^2.0.4",
-    "husky": "^7.0.0"
+    "nodemon": "^2.0.4"
+  },
+  "engines": {
+    "node": ">=14.0.0"
   }
 }

@@ -10,7 +10,7 @@ const { router: userRoutes } = require('./routes/userRoutes');
 
 const app = express();
 
-// Serve static files dynamically, regardless of where they are located
+// Serve static files from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware
@@ -59,9 +59,9 @@ app.post('/api/users/logbook', (req, res) => {
   res.status(201).json({ message: 'Log entry added successfully', entry });
 });
 
-// Basic route for root
+// Basic route to serve index.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));  // Serve the homepage
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Integrate the user authentication routes
